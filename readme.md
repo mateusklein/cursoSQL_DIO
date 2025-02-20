@@ -1,4 +1,1 @@
 # GITHUB PARA O CURSO DA DIO DE SQL
-
-# Mateus Klein
-
