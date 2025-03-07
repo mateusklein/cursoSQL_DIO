@@ -1,0 +1,17 @@
+-- PARA FAZER O BACKUP DO DATABASE ECOMMERCE COMPLETO:
+mysqldump -u root -p ecommerce > backup_ecommerce.sql
+
+-- PARA FAZER O RECOVERY DO BACKUP (IMPORTANTE CRIAR UM BANCO PARA JOGAR AS INFORMAÇÕES DENTRO):
+mysql -u root -p ecommerce_reco < backup_ecommerce.sql
+
+-- REALIZANDO O BACKUP DE DIFERENTES BANCOS DE DADOS:
+mysqldump -u root -p --databases ecommerce transactionexample universidade > backup_databases.sql
+
+-- ADICIONANDO PROCEDURES, INDICES E TRIGGERS:
+mysqldump --routines --triggers -u root -p --databases ecommerce transactionexample universidade > backup_databases_add.sql
+
+
+-- SEPARANDO EM DADOS E STATEMENTS:
+mysqldump --no-data -u root -p ecommerce > backup_ecommerce_state.sql
+mysqldump --no-create-info -u root -p ecommerce > backup_ecommerce_data.sql
+

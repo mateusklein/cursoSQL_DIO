@@ -1,0 +1,260 @@
+mysql> 
+mysql> 
+mysql> 
+mysql> select @@autocommit;
++--------------+
+| @@autocommit |
++--------------+
+|            1 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> set @@autocommit = 0;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> select @@autocommit;
++--------------+
+| @@autocommit |
++--------------+
+|            0 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> ^C
+mysql> set @@autocommit = 0;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> -- PRIMEIRA SESSAP
+mysql> -- PRIMEIRA SESSAO
+mysql> -- SEGUNDA SESSAO
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> SELECT * FROM ordersdetails;
++--------------+-------------+---------------+--------+
+| orderNumbers | productCode | quantityOrder | price  |
++--------------+-------------+---------------+--------+
+|            1 | P001        |             2 | 100.00 |
+|            1 | P002        |             1 | 50.00  |
+|            2 | P003        |             3 | 75.00  |
+|            3 | P001        |             1 | 100.00 |
+|            4 | P004        |             2 | 200.00 |
+|            9 | 18_1749     |            30 | 136    |
+|            9 | 18_2248     |            50 | 55.09  |
++--------------+-------------+---------------+--------+
+7 rows in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> update ordersDetails set price = price+2;
+Query OK, 7 rows affected (0.00 sec)
+Rows matched: 7  Changed: 7  Warnings: 0
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql>  update ordersDetails set price = price+3;
+ERROR 1046 (3D000): No database selected
+mysql> use transactionExample;
+Database changed
+mysql> 
+mysql> 
+mysql> -- APàS REALIZAR ESSA QUERRY DE UPDATE AO TENTAR EXECUTAR UMA QERRY NA SESSAO 2 FICARA EM ESPERA
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql>  update ordersDetails set price = price+3;
+^C -- query aborted
+ERROR 1317 (70100): Query execution was interrupted
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> -- DEU DEADLOCK POIS ESTAVA AGUARDANDO COMMIT NA PRIMEIRA 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> COMMIT;;
+Query OK, 0 rows affected (0.01 sec)
+
+ERROR: 
+No query specified
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> COMMIT;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql>  update ordersDetails set price = price+3;
+Query OK, 7 rows affected (0.00 sec)
+Rows matched: 7  Changed: 7  Warnings: 0
+
+mysql> 
+mysql> 
+mysql> -- APàS DAR O COMMIT NO 1 AQUI DA CERTO 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> -- APàS REALIZAR O COMMIT AQUI LIBERA PARA COMMITAR NA SEGUNDA 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> -- TIPOS DE LEITURA
+mysql> 
+mysql> 
+mysql> -- TIPOS DE LEITURA
+mysql> 
+mysql> 
+mysql> set @sl -3
+    -> 
+    -> 
+    -> 
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-3' at line 1
+mysql> 
+mysql> 
+mysql> 
+mysql> set @sl = 3;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> set @sl = (select salary from customer where id_customer =1);
+ERROR 1146 (42S02): Table 'transactionexample.customer' doesn't exist
+mysql> 
+mysql> 
+mysql> show database
+    -> .;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'database
+.' at line 1
+mysql> show databases;
++---------------------+
+| Database            |
++---------------------+
+| company_constraints |
+| ecommerce           |
+| information_schema  |
+| mysql               |
+| performance_schema  |
+| sakila              |
+| sys                 |
+| transactionexample  |
+| univeridade         |
+| universidade        |
+| world               |
++---------------------+
+11 rows in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> use company_constraints;
+Database changed
+mysql> 
+mysql> 
+mysql> set @sl = (select salary from customer where id_customer =1);
+ERROR 1146 (42S02): Table 'company_constraints.customer' doesn't exist
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> select @sl
+    -> ;
++------+
+| @sl  |
++------+
+|    3 |
++------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> use transactionexample
+Database changed
+mysql> 
+mysql> 
+mysql> show tables;
++------------------------------+
+| Tables_in_transactionexample |
++------------------------------+
+| orders                       |
+| ordersdetails                |
++------------------------------+
+2 rows in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> notee
+mysql> notee

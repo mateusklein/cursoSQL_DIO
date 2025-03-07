@@ -1,0 +1,211 @@
+mysql> 
+mysql> 
+mysql> 
+mysql> use transactionExample
+Database changed
+mysql> 
+mysql> 
+mysql> 
+mysql> select @@autocommit;
++--------------+
+| @@autocommit |
++--------------+
+|            1 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> set @@autocommit = 0;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> select @@autocommit;
++--------------+
+| @@autocommit |
++--------------+
+|            0 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> SHOW SESSION VARIABLES LIKE '%ISOLATE%';
+Empty set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> select @nextorder := max (orderNumbers) + 1 as nex_number 
+    -> from orders;
+ERROR 1630 (42000): FUNCTION transactionexample.max does not exist. Check the 'Function Name Parsing and Resolution' section in the Reference Manual
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> select @nextorder := max (orderNumbers) + 1 as nex_number
+    -> from orders;
+ERROR 1630 (42000): FUNCTION transactionexample.max does not exist. Check the 'Function Name Parsing and Resolution' section in the Reference Manual
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql>  select @nextorder := max(orderNumbers) + 1 as nex_number
+    -> from orders;
++------------+
+| nex_number |
++------------+
+|          6 |
++------------+
+1 row in set, 1 warning (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> insert into orders values (@nextorder, '2005-05-31', '2005-06-10', '2005-06-11', 'Despachado');
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> 
+mysql> 
+mysql> 
+mysql> desc orders;
++----------------+----------------------------------------------+------+-----+---------+----------------+
+| Field          | Type                                         | Null | Key | Default | Extra          |
++----------------+----------------------------------------------+------+-----+---------+----------------+
+| orderNumbers   | int                                          | NO   | PRI | NULL    | auto_increment |
+| orderDate      | date                                         | YES  |     | NULL    |                |
+| requiredDate   | date                                         | YES  |     | NULL    |                |
+| shippedDate    | date                                         | YES  |     | NULL    |                |
+| orderStatus    | enum('DESPACHADO','EM PROGRESSO','ENTREGUE') | YES  |     | NULL    |                |
+| customerNumber | int                                          | YES  |     | NULL    |                |
++----------------+----------------------------------------------+------+-----+---------+----------------+
+6 rows in set (0.01 sec)
+
+mysql> insert into orders values (@nextorder, '2005-05-31', '2005-06-10', '2005-06-11', 'Despachado', 2);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> savepoint insercao_order;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> -- nova insercao em ordersDetails
+mysql> 
+mysql> 
+mysql> insert into ordersDetails values (@nextorder, 181749, 30, '136.30')
+    -> ;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> insert into ordersDetails values (@nextorder, 182248, 50, '55.09')
+    -> ;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> savepoint insercao_order_details;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> select ordersNumbers from orders;
+ERROR 1054 (42S22): Unknown column 'ordersNumbers' in 'field list'
+mysql> 
+mysql> 
+mysql> 
+mysql> select * from orders;
++--------------+------------+--------------+-------------+--------------+----------------+
+| orderNumbers | orderDate  | requiredDate | shippedDate | orderStatus  | customerNumber |
++--------------+------------+--------------+-------------+--------------+----------------+
+|            1 | 2024-02-01 | 2024-02-05   | 2024-02-03  | DESPACHADO   |            101 |
+|            2 | 2024-02-02 | 2024-02-06   | 2024-02-04  | ENTREGUE     |            102 |
+|            3 | 2024-02-03 | 2024-02-07   | 2024-02-05  | DESPACHADO   |            103 |
+|            4 | 2024-02-04 | 2024-02-08   | 2024-02-06  | EM PROGRESSO |            104 |
+|            5 | 2024-02-05 | 2024-02-09   | 2024-02-07  | ENTREGUE     |            105 |
+|            6 | 2005-05-31 | 2005-06-10   | 2005-06-11  | DESPACHADO   |              2 |
++--------------+------------+--------------+-------------+--------------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> select orderNumbers from orders;
++--------------+
+| orderNumbers |
++--------------+
+|            1 |
+|            2 |
+|            3 |
+|            4 |
+|            5 |
+|            6 |
++--------------+
+6 rows in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> insert into ordersDetails values (@nextorder, 181749, 30, '136.30');
+ERROR 1062 (23000): Duplicate entry '6-181749' for key 'ordersdetails.PRIMARY'
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> insert into ordersDetails values (@nextorder+1, 181749, 30, '136.30');
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`transactionexample`.`ordersdetails`, CONSTRAINT `fk_orderdetails` FOREIGN KEY (`orderNumbers`) REFERENCES `orders` (`orderNumbers`))
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> rollback to savepoint insercao_order
+    -> ;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> insert into ordersDetails values (@nextorder+1, 181749, 30, '136.30');
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`transactionexample`.`ordersdetails`, CONSTRAINT `fk_orderdetails` FOREIGN KEY (`orderNumbers`) REFERENCES `orders` (`orderNumbers`))
+mysql> insert into ordersDetails values (@nextorder, 181749, 30, '136.30');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> 
+mysql> notee
